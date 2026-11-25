@@ -1,0 +1,1070 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-mVBu1xrkW3/4J7lXcaiEbcNnFvbgtRTNQ/BWX545EOs='; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="referrer" content="no-referrer">
+<meta name="description" content="Interaktive Demo: eine Kundenanfrage für ein Netzteil von der Dokumentenauswertung über die Qualifizierung bis zur ERP-Vorschau, mit Prozessansicht und Bewertung von KI-Ansätzen. KI-Schritte sind eine regelbasierte Simulation.">
+<link rel="icon" href="data:,">
+<title>Von der Kundenanfrage zum Auftrag | Demo</title>
+<style>
+:root{
+  --g900:#04342C;--g800:#085041;--g600:#0F6E56;--g400:#1D9E75;--g200:#9FE1CB;--g100:#C9EEDF;--g50:#E1F5EE;
+  --t900:#1C1C1A;--t800:#2C2C2A;--t700:#444441;--t500:#5F5E5A;--t400:#888780;--t200:#D3D1C7;--t100:#F1EFE8;
+  --a50:#FAEEDA;--a200:#F0C98A;--a800:#633806;
+  --r50:#F8E3DE;--r200:#E7B2A5;--r800:#7A2618;
+  --bg:#FBFAF7;--card:#FFFFFF;--radius:10px;
+  --font:system-ui,-apple-system,"Segoe UI",Calibri,Roboto,Arial,sans-serif;
+  --mono:ui-monospace,Consolas,"Cascadia Mono",monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--t800);font:16px/1.55 var(--font)}
+a{color:var(--g800)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,pre:focus-visible,main:focus-visible{outline:3px solid var(--g400);outline-offset:2px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
+header.top{background:var(--g900);color:#fff;padding:22px 0 18px}
+header.top h1{margin:0 0 4px;font-size:clamp(1.35rem,3.2vw,1.9rem);line-height:1.25}
+header.top p{margin:0;color:var(--g100);font-size:.95rem}
+.simbadge{display:inline-block;background:var(--a50);color:var(--a800);border:1px solid var(--a200);border-radius:999px;padding:1px 10px;font-size:.78rem;font-weight:600;letter-spacing:.02em;vertical-align:middle}
+header.top .simbadge{margin-top:10px}
+nav.progress{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--t200)}
+nav.progress ol{list-style:none;margin:0 auto;padding:8px 16px;display:flex;gap:4px;max-width:1000px;overflow-x:auto;scrollbar-width:thin}
+nav.progress li{flex:1 0 auto}
+nav.progress button{width:100%;border:0;background:var(--t100);color:var(--t700);padding:6px 10px;border-radius:6px;font:600 .8rem/1.2 var(--font);cursor:pointer;white-space:nowrap}
+nav.progress button[aria-current="step"]{background:var(--g800);color:#fff}
+nav.progress button.done{background:var(--g100);color:var(--g900)}
+nav.progress button:disabled{cursor:default;opacity:.6}
+main{padding:22px 0 40px}
+main:focus{outline:none}
+h2{font-size:1.4rem;color:var(--g900);margin:0 0 6px;line-height:1.3}
+h3{font-size:1.05rem;color:var(--g900);margin:0 0 8px}
+.lead{color:var(--t700);margin:0 0 18px;max-width:72ch}
+.card{background:var(--card);border:1px solid var(--t200);border-radius:var(--radius);padding:16px 18px;margin:0 0 14px;min-width:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.grid2>*,.grid3>*,.grid4>*{min-width:0}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}.grid4{grid-template-columns:1fr 1fr}}
+.case{display:flex;flex-direction:column;text-align:left;border:2px solid var(--t200);background:#fff;border-radius:var(--radius);padding:14px;cursor:pointer;font:inherit;color:inherit;height:100%;width:100%}
+.case:hover{border-color:var(--g400)}
+.case[aria-pressed="true"]{border-color:var(--g800);background:var(--g50)}
+.case .tag{font-size:.75rem;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.04em}
+.case strong{display:block;margin:4px 0 6px;color:var(--g900)}
+.case span.d{font-size:.9rem;color:var(--t700)}
+label.f{display:block;font-weight:600;font-size:.9rem;margin:10px 0 4px;color:var(--t800)}
+input[type=text],input[type=number],input[type=date],textarea,select{width:100%;font:inherit;padding:7px 9px;border:1px solid var(--t400);border-radius:6px;background:#fff;color:var(--t900)}
+input[aria-invalid="true"]{border:2px solid var(--r800);background:var(--r50)}
+textarea{min-height:110px;resize:vertical}
+.hint{font-size:.85rem;color:var(--t500);margin:6px 0 0}
+.panel{border-radius:var(--radius);padding:14px 16px;margin:0 0 14px;min-width:0}
+.panel h3{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.panel.ki{background:var(--a50);border:1px dashed var(--a200)}
+.panel.ki h3{color:var(--a800)}
+.panel.lean{background:var(--g50);border:1px solid var(--g100)}
+.panel.mensch{background:#fff;border:1px solid var(--t200);border-left:5px solid var(--g800)}
+.panel.warn{background:var(--r50);border:1px solid var(--r200);color:var(--r800)}
+.rule{font-family:var(--mono);font-size:.8rem;background:#fff;border:1px solid var(--a200);border-radius:4px;padding:1px 6px;color:var(--a800);word-break:break-word}
+ul.clean{list-style:none;margin:0;padding:0}
+ul.clean li{padding:4px 0}
+.mail{white-space:pre-wrap;background:#fff;border:1px solid var(--t200);border-radius:8px;padding:12px 14px;font-size:.95rem;line-height:1.7}
+mark.hl{background:#FBE3B0;color:var(--t900);border-radius:3px;padding:1px 2px;box-shadow:inset 0 -2px 0 var(--a200)}
+mark.hl small{font-size:.66rem;font-weight:700;color:var(--a800);margin-left:4px;text-transform:uppercase;letter-spacing:.03em}
+table{border-collapse:collapse;width:100%}
+.ft th,.ft td{text-align:left;padding:6px 6px;border-bottom:1px solid var(--a200);vertical-align:top;font-size:.9rem}
+.ft thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;color:var(--a800)}
+.ft tr:last-child td{border-bottom:0}
+@media (max-width:560px){.ft .tr{display:none}}
+.ok,.nf{display:inline-block;border-radius:999px;padding:0 8px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.ok{background:var(--g100);color:var(--g900)}
+.nf{background:var(--r50);color:var(--r800);border:1px solid var(--r200)}
+.pfl{font-size:.72rem;color:var(--t500);display:block}
+.tile{background:#fff;border:1px solid var(--t200);border-radius:var(--radius);padding:12px}
+.tile .l{font-size:.8rem;color:var(--t500);text-transform:uppercase;letter-spacing:.03em;font-weight:700}
+.tile .v{font-size:1.35rem;font-weight:700;color:var(--g900);line-height:1.25;margin:2px 0 4px}
+.tile .r{font-size:.84rem;color:var(--t700)}
+.ampel{display:flex;gap:14px;align-items:flex-start;border-radius:var(--radius);padding:14px 16px;margin:0 0 14px;border:1px solid}
+.ampel .dot{flex:0 0 auto;width:22px;height:22px;border-radius:50%;margin-top:3px;border:2px solid rgba(0,0,0,.25)}
+.ampel h3{margin:0 0 4px}
+.ampel.gruen{background:var(--g50);border-color:var(--g200)}.ampel.gruen .dot{background:#1D9E75}
+.ampel.gelb{background:var(--a50);border-color:var(--a200)}.ampel.gelb .dot{background:#E8A33A}.ampel.gelb h3{color:var(--a800)}
+.ampel.rot{background:var(--r50);border-color:var(--r200)}.ampel.rot .dot{background:#C2462E}.ampel.rot h3{color:var(--r800)}
+.entwurf{background:#fff;border:1px solid var(--t200);border-radius:8px;padding:12px 14px;font-size:.92rem;white-space:pre-wrap}
+dl.kv{display:grid;grid-template-columns:minmax(120px,38%) 1fr;gap:4px 10px;margin:0;font-size:.9rem}
+dl.kv dt{color:var(--t500)}
+dl.kv dd{margin:0;color:var(--t900);font-weight:600;word-break:break-word}
+pre.json{font:.8rem/1.5 var(--mono);background:var(--g900);color:#E9F6F1;border-radius:8px;padding:12px 14px;margin:0;overflow:auto;max-height:520px;white-space:pre-wrap;word-break:break-word}
+#dash .kpis{grid-template-columns:1fr 1fr}
+.wk td,.wk th{padding:6px 6px;border-bottom:1px solid var(--g100);text-align:left;vertical-align:top;font-size:.88rem}
+.wk tbody th{font-weight:600;color:var(--t800);white-space:nowrap}
+.wk .chip{margin:0 4px 4px 0}
+.status{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.8rem;font-weight:700;background:var(--t100);color:var(--t700);border:1px solid var(--t200)}
+.status.frei{background:var(--g800);color:#fff;border-color:var(--g800)}
+.errs{margin:0;padding-left:20px}
+.navbtns{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.btn{font:600 1rem var(--font);border-radius:8px;padding:10px 18px;cursor:pointer;border:2px solid var(--g800);background:var(--g800);color:#fff}
+.btn.sec{background:#fff;color:var(--g800)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media (max-width:760px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{background:#fff;border:1px solid var(--t200);border-radius:var(--radius);padding:12px}
+.kpi .v{font-size:1.5rem;font-weight:700;color:var(--g900);line-height:1.2}
+.kpi .l{font-size:.82rem;color:var(--t500)}
+.vs-row{display:grid;grid-template-columns:160px 1fr 80px;gap:10px;align-items:center;margin:6px 0;font-size:.9rem}
+@media (max-width:560px){.vs-row{grid-template-columns:1fr 70px}.vs-row .bar{grid-column:1 / -1;order:3}}
+.bar{display:flex;height:22px;border-radius:4px;overflow:hidden;background:var(--t100)}
+.bar .b{background:var(--g800)}
+.bar .w{background:repeating-linear-gradient(135deg,var(--a200) 0 6px,#F6DDB3 6px 12px)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.83rem;color:var(--t700);margin-top:8px}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.legend .lb{background:var(--g800)}
+.legend .lw{background:repeating-linear-gradient(135deg,var(--a200) 0 4px,#F6DDB3 4px 8px)}
+.tt th,.tt td{text-align:left;padding:6px 6px;border-bottom:1px solid var(--t200);vertical-align:middle;font-size:.9rem}
+.tt tbody th{font-weight:600;color:var(--t800)}
+.tt thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;color:var(--t500)}
+.tt input{max-width:92px}
+.tt .skip{font-size:.78rem;color:var(--t500);display:block}
+.scroll{overflow-x:auto}
+.waste{display:flex;flex-wrap:wrap;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--g200);background:#fff;border-radius:999px;padding:3px 10px;font-size:.82rem;cursor:pointer}
+.pill input{accent-color:var(--g800)}
+.pill.on{background:var(--g100);border-color:var(--g600)}
+.mx th,.mx td{padding:7px 6px;border-bottom:1px solid var(--t200);text-align:left;font-size:.86rem;vertical-align:middle}
+.mx thead th{font-size:.74rem;text-transform:uppercase;letter-spacing:.03em;color:var(--t500)}
+.mx td:first-child{font-weight:600;color:var(--g900);min-width:180px}
+.chip{display:inline-block;border-radius:6px;padding:2px 8px;font-size:.8rem;font-weight:700;white-space:nowrap;border:1px solid transparent}
+.chip.t1{background:var(--g800);color:#fff}
+.chip.t2{background:var(--g100);color:var(--g900);border-color:var(--g200)}
+.chip.t3{background:#F6D9A0;color:var(--a800);border-color:var(--a200)}
+.uc h3{margin-bottom:2px}
+.uc .art{font-size:.8rem;color:var(--t500);margin:0 0 8px}
+.uc .row{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;align-items:start;padding:6px 0;border-top:1px solid var(--t100);font-size:.88rem}
+.uc .row select{max-width:130px;padding:4px 6px}
+.uc .row .s{color:var(--t700)}
+.uc .vorschlag{margin-top:8px;font-size:.9rem;background:var(--g50);border-radius:6px;padding:6px 10px}
+@media (max-width:480px){.uc .row{grid-template-columns:1fr}}
+.reco{border-radius:var(--radius);padding:14px 16px;background:var(--g900);color:#fff}
+.reco b{color:var(--g200)}
+details.rules{background:#fff;border:1px solid var(--t200);border-left:5px solid var(--a200);border-radius:var(--radius);padding:10px 16px;margin:0 0 14px}
+details.rules summary{cursor:pointer;font-weight:700;color:var(--a800)}
+details.rules[open] summary{margin-bottom:8px}
+details.rules h4{margin:12px 0 4px;font-size:.92rem;color:var(--g900)}
+details.rules ul{margin:4px 0;padding-left:20px;font-size:.9rem}
+details.rules table{font-size:.86rem}
+details.rules td,details.rules th{border-bottom:1px solid var(--t100);padding:4px 6px;text-align:left;vertical-align:top}
+details.about{background:#fff;border:1px solid var(--t200);border-radius:var(--radius);padding:12px 16px;margin:0 0 14px}
+details.about summary{cursor:pointer;font-weight:700;color:var(--g900)}
+.note{font-size:.85rem;color:var(--t500);font-style:italic}
+footer{border-top:1px solid var(--t200);padding:18px 0 28px;font-size:.85rem;color:var(--t500)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+@media print{nav.progress,.navbtns{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1>Von der Kundenanfrage zum Auftrag</h1>
+    <p>Interaktive Demo von René Rößger: Anfrage auswerten, qualifizieren, ans ERP übergeben, Prozess und KI-Ansätze bewerten</p>
+    <span class="simbadge">Simulation: erfundene Fälle, KI-Schritte regelbasiert</span>
+  </div>
+</header>
+<nav class="progress" aria-label="Fortschritt"><ol id="progress"></ol></nav>
+<main class="wrap" id="main" tabindex="-1"><noscript><p>Diese Demo braucht JavaScript. Es werden keine Daten übertragen.</p></noscript></main>
+<footer>
+  <div class="wrap">
+    René Rößger, Chemnitz. Erstellt im November 2026 für die Bewerbung bei der PULS Vario GmbH. Alle Fälle sind erfunden und beschreiben keine internen Abläufe von PULS.
+    Keine Cookies, kein Tracking, Ihre Eingaben bleiben in diesem Browserfenster. Code: <a id="repoLink" href="#">GitHub</a>
+  </div>
+</footer>
+
+<script>
+"use strict";
+/* ============================================================
+   Inhalte, Regeln und Schwellenwerte.
+   Die Logik liest nur diese Konstanten. Die aufklappbaren Blöcke
+   "So entscheidet die Demo" werden aus denselben Konstanten erzeugt.
+   ============================================================ */
+const REPO_URL = "https://github.com/rroessger/anfrage-auftrag-demo";
+const FIRMA = "Beispiel Stromversorgung GmbH (fiktiv)";
+
+/* Drei erfundene Anfragen */
+const CASES = {
+  vollstaendig: {
+    tag: "Vollständig", betreff: "Anfrage Netzteil Diagnosegerät",
+    kurz: "Alle Angaben vorhanden, Einsatz in der Medizintechnik, Sonderstecker.",
+    text: "Guten Tag,\nfür ein neues Diagnosegerät suchen wir ein Hutschienen-Netzteil. Ausgang 24 V DC, 10 A, Eingang 100 bis 240 V AC. Wir rechnen mit etwa 800 Stück pro Jahr, der Serienstart ist im dritten Quartal 2027 geplant. Benötigt wird ein Sonderstecker mit Verriegelung. Das Gerät wird in der Medizintechnik eingesetzt, gewünscht ist die Norm IEC 60601.\nMit freundlichen Grüßen\nEinkauf, Beispielkunde (fiktiv)"
+  },
+  unvollstaendig: {
+    tag: "Unvollständig", betreff: "Netzteil für unsere Anlage",
+    kurz: "Keine Zahlen, kein Termin.",
+    text: "Hallo,\nwir brauchen ein Netzteil für unsere Anlage, möglichst klein, bitte um Angebot.\nDanke"
+  },
+  standard: {
+    tag: "Kein Fall für Sonderanfertigung", betreff: "Netzteile für Prüfaufbau",
+    kurz: "Drei Stück, Standardwerte, sehr kurzfristig.",
+    text: "Guten Tag,\nfür einen Prüfaufbau brauchen wir drei Stück Netzteile, Standard 24 V, 5 A, bis nächste Woche. Keine Sonderwünsche.\nViele Grüße"
+  }
+};
+
+/* Schritt 1: Felder und Erkennungsregeln */
+const PFLICHT = ["spannung", "strom", "menge", "termin", "umfeld"];
+const FELD = {
+  spannung: "Ausgangsspannung", strom: "Ausgangsstrom", menge: "Stückzahl", termin: "Zieltermin",
+  umfeld: "Einsatzumfeld", sonder: "Sonderwünsche", normen: "Normen", bauraum: "Bauraum"
+};
+const KURZ = { spannung: "Spannung", strom: "Strom", menge: "Menge", termin: "Termin", umfeld: "Umfeld", sonder: "Sonderwunsch", normen: "Norm", bauraum: "Bauraum" };
+
+const ZAHLWORTE = { "zwölf": 12, eins: 1, einen: 1, eine: 1, ein: 1, zwei: 2, drei: 3, vier: 4, "fünf": 5, sechs: 6, sieben: 7, acht: 8, neun: 9, zehn: 10, elf: 11 };
+const NUM = "\\d{1,3}(?:\\.\\d{3})+|\\d+|" + Object.keys(ZAHLWORTE).sort((a, b) => b.length - a.length).join("|");
+const LB = "(?<![\\p{L}\\d.,])";
+
+const R = {
+  spannung: new RegExp(LB + "(\\d+(?:[.,]\\d+)?)\\s?(?:V|Volt)(?!\\s?AC)(?:\\s?DC)?(?![\\p{L}\\d])", "u"),
+  strom: new RegExp(LB + "(\\d+(?:[.,]\\d+)?)\\s?(?:A|Ampere)(?![\\p{L}\\d])", "u"),
+  mengeJahr: [
+    new RegExp(LB + "(" + NUM + ")\\s*(?:Stück|Stk\\.?)\\s*(?:pro|im|je|/)\\s*Jahr", "iu"),
+    new RegExp(LB + "(" + NUM + ")\\s*(?:pro Jahr|im Jahr|jährlich)", "iu")
+  ],
+  mengeGesamt: new RegExp(LB + "(" + NUM + ")\\s*(?:Stück|Stk\\.?)(?!\\p{L})", "iu"),
+  normen: /(?<![\p{L}])(?:DIN EN|IEC|EN|UL)\s?\d{3,5}(?:-\d+)*/gu,
+  bauraum: /klein|kompakt|schmal|bauraum/giu
+};
+
+const QUARTAL_WORT = { ersten: 1, zweiten: 2, dritten: 3, vierten: 4, "1.": 1, "2.": 2, "3.": 3, "4.": 4 };
+const TERMIN_REGELN = [
+  { name: "Quartal in Worten", beispiel: "„dritten Quartal 2027“, gilt ab Quartalsbeginn",
+    re: /(ersten|zweiten|dritten|vierten|[1-4]\.)\s+Quartal\s+(20\d\d)/iu, f: m => quartal(QUARTAL_WORT[m[1].toLowerCase()], +m[2]) },
+  { name: "Quartal kurz", beispiel: "„Q3 2027“ oder „Q3/2027“, gilt ab Quartalsbeginn",
+    re: /(?<![\p{L}\d])Q([1-4])\s*\/?\s*(20\d\d)/iu, f: m => quartal(+m[1], +m[2]) },
+  { name: "Kalenderwoche", beispiel: "„KW 12“ oder „KW 12/2027“, Montag der Woche",
+    re: /(?<![\p{L}])KW\s?(\d{1,2})(?:\s*\/\s*(20\d\d))?/iu, f: m => kalenderwoche(+m[1], m[2] ? +m[2] : null) },
+  { name: "Datum", beispiel: "„15.03.2027“",
+    re: /(?<!\d)(\d{1,2})\.(\d{1,2})\.(20\d\d)/u, f: m => datum(+m[3], +m[2], +m[1]) },
+  { name: "nächste Woche", beispiel: "„nächste Woche“, heute plus 7 Tage",
+    re: /nächste[nr]?\s+Woche/iu, f: () => plusTage(7) }
+];
+
+/* Schlagwortregeln: Treffer ist das ganze Wort, das einen der Wortteile enthält (z. B. „Diagnosegerät“) */
+const wortRegel = r => Object.assign(r, { re: new RegExp("\\p{L}*(?:" + r.kern + ")\\p{L}*", "giu") });
+/* Reihenfolge = Vorrang: die erste Regel mit Treffer bestimmt das Einsatzumfeld */
+const UMFELD_REGELN = [
+  { kern: "medizin|diagnose|patient", wert: "Medizintechnik" },
+  { kern: "bahn", wert: "Bahntechnik" },
+  { kern: "labor|prüfaufbau|prüfstand", wert: "Labor und Prüfaufbau" },
+  { kern: "industrie|anlage|maschine", wert: "Industrie und Anlagenbau" }
+].map(wortRegel);
+const SONDER_REGELN = [
+  { kern: "sonderstecker", wert: "Sonderstecker" },
+  { kern: "kundenspezifisch", wert: "kundenspezifische Ausführung" },
+  { kern: "sonderspannung", wert: "Sonderspannung" },
+  { kern: "gehäuse", wert: "Gehäuse" },
+  { kern: "verriegelung", wert: "Verriegelung" }
+].map(wortRegel);
+
+const RUECKFRAGEN = {
+  spannung: "Welche Ausgangsspannung benötigen Sie (V DC)?",
+  strom: "Welchen Ausgangsstrom benötigen Sie (A)?",
+  menge: "Mit welcher Stückzahl pro Jahr rechnen Sie?",
+  termin: "Bis wann benötigen Sie Muster und Serienteile?",
+  umfeld: "In welchem Gerät oder Umfeld wird das Netzteil eingesetzt (zum Beispiel Industrie, Medizintechnik, Bahn)?",
+  bauraum: "Welcher Bauraum steht zur Verfügung (Breite, Höhe, Tiefe in mm)?"
+};
+
+/* Schritt 2: Schwellenwerte der Qualifizierung */
+const Q = {
+  VOLLST_MIN: 0.8,          // darunter: Rückfragen nötig
+  AUFWAND_MITTEL_AB: 1,     // Anzahl Sonderwünsche
+  AUFWAND_HOCH_AB: 3,
+  MEDIZIN_ZUSCHLAG: 1,      // Medizintechnik oder Norm 60601 zählt als ein weiterer Sonderwunsch
+  POT_HOCH_AB: 500,         // Stück pro Jahr
+  POT_MITTEL_AB: 100,
+  DRINGEND_UNTER_WOCHEN: 4,
+  STANDARD_MENGE_UNTER: 50  // und keine Sonderwünsche: Standardweg
+};
+const ENTSCHEIDUNG = {
+  rueckfrage: { ampel: "gelb", titel: "Rückfragen nötig", kurz: "Rückfragen" },
+  standard: { ampel: "rot", titel: "Standardweg: Umleitung an den Standardvertrieb, keine Sonderanfertigung", kurz: "Standardweg" },
+  weiter: { ampel: "gruen", titel: "Weiter an Technik und Arbeitsvorbereitung", kurz: "Weiter" }
+};
+
+/* Schritt 3: Prüfregeln vor der Übergabe */
+const CHECK = { U_MIN: 5, U_MAX: 60, I_MIN: 0.1, I_MAX: 100 };
+
+/* Schritt 4: Prozess mit Beispielannahmen. Bearbeitung in Minuten, Wartezeit in Stunden. */
+const PROZESS = [
+  { id: "eingang", name: "Eingang", min: 10, std: 4, waste: ["warten"],
+    beispiel: "Die Anfrage liegt im Sammelpostfach, bis jemand sie öffnet." },
+  { id: "qualifizieren", name: "Qualifizieren", min: 20, std: 8, waste: ["bewegung", "ueberbearbeitung"],
+    beispiel: "Angaben werden aus Mail und Anhang zusammengesucht und in eine Tabelle übertragen." },
+  { id: "rueckfrage", name: "Rückfrage Kunde", min: 15, std: 48, waste: ["fehler", "warten"],
+    beispiel: "Fehlende Angaben lösen eine Rückfrage aus, die Anfrage wartet auf die Antwort." },
+  { id: "technik", name: "Technische Prüfung", min: 90, std: 24, waste: ["warten", "wissen"],
+    beispiel: "Die Prüfung wartet auf freie Kapazität, Wissen zu ähnlichen Varianten steckt in einzelnen Köpfen." },
+  { id: "erp", name: "Übergabe ans ERP", min: 30, std: 8, waste: ["ueberbearbeitung", "fehler"],
+    beispiel: "Daten werden ein zweites Mal von Hand erfasst, Tippfehler fallen erst später auf." },
+  { id: "freigabe", name: "Freigabe", min: 10, std: 16, waste: ["warten", "bestaende"],
+    beispiel: "Freigaben sammeln sich bis zur nächsten festen Runde." }
+];
+/* Schritte, die je nach Entscheidung aus Schritt 2 nicht durchlaufen werden (Startwert 0) */
+const NICHT_DURCHLAUFEN = {
+  weiter: ["rueckfrage"],
+  rueckfrage: [],
+  standard: ["rueckfrage", "technik", "erp", "freigabe"]
+};
+
+/* Acht Verschwendungsarten nach gängiger Lean-Einteilung, auf Büroprozesse übertragen */
+const WASTE = {
+  transport:        { name: "Transport", text: "Informationen werden weitergereicht, kopiert, neu verschickt" },
+  bestaende:        { name: "Bestände", text: "Anfragen stapeln sich unbearbeitet" },
+  bewegung:         { name: "Bewegung", text: "Suchen, zwischen Systemen wechseln" },
+  warten:           { name: "Wartezeit", text: "Die Anfrage liegt, niemand arbeitet daran" },
+  ueberproduktion:  { name: "Überproduktion", text: "Mehr oder früher erarbeitet als nötig" },
+  ueberbearbeitung: { name: "Überbearbeitung", text: "Doppelte Erfassung, unnötige Schleifen" },
+  fehler:           { name: "Fehler und Nacharbeit", text: "Rückfragen, Korrekturen, falsche Daten" },
+  wissen:           { name: "Ungenutztes Wissen", text: "Erfahrung steckt in einzelnen Köpfen" }
+};
+
+/* Schritt 5: KI-Ansätze. Stufen 1 gering, 2 mittel, 3 hoch. Alle Einschätzungen sind Hypothesen. */
+const STUFE = ["", "gering", "mittel", "hoch"];
+const UC = { PILOT_AB: 7, DANACH_AB: 5 };
+const UC_TEXT = { pilot: "Zuerst angehen", danach: "Danach prüfen", zurueck: "Zurückstellen" };
+const ANSAETZE = [
+  { id: "llm", titel: "Anfragen mit Sprachmodell auswerten", art: "KI: Sprachmodell liest Mail und Anhang (Schritt 1)",
+    start: { nutzen: 3, aufwand: 2, risiko: 2 },
+    satz: {
+      nutzen: "Anfragen kommen frei formuliert, ein Sprachmodell erfasst auch Angaben, für die es keine feste Regel gibt.",
+      aufwand: "Die Technik ist verfügbar. Aufwand steckt in Testfällen, Prüfregeln und der Anbindung an das Postfach.",
+      risiko: "Falsch erkannte Werte sind möglich, darum prüft ein Mensch jedes Feld vor der Übergabe."
+    },
+    datenschutz: { stufe: "beachten", ton: 2, satz: "Anfragen enthalten Namen und Kontaktdaten. Nur mit Vertrag zur Auftragsverarbeitung oder lokaler Verarbeitung." },
+    geheimhaltung: { stufe: "erhöht", ton: 3, satz: "Kundenspezifikationen sind vertraulich. Lokale Verarbeitung oder Vertrag prüfen, kein Training mit Kundendaten." },
+    kivo: { stufe: "begrenzt", ton: 2, satz: "Interner Assistent, keine Entscheidung über Personen. KI-Kompetenz der Nutzer sicherstellen, Einordnung im Einzelfall prüfen." } },
+  { id: "regel", titel: "Anfragen per Regelwerk qualifizieren", art: "Digitalisierung, KI nicht nötig (Schritt 2)",
+    start: { nutzen: 2, aufwand: 1, risiko: 1 },
+    satz: {
+      nutzen: "Vollständigkeit und Weg stehen sofort fest, Rückfragen gehen früher raus.",
+      aufwand: "Feste Regeln in Formular oder Workflow, ohne Training und ohne Sprachmodell.",
+      risiko: "Regeln sind nachvollziehbar und prüfbar, Fehler lassen sich direkt korrigieren."
+    },
+    datenschutz: { stufe: "gering", ton: 1, satz: "Verarbeitung im eigenen System, keine Weitergabe an Dritte." },
+    geheimhaltung: { stufe: "gering", ton: 1, satz: "Die Daten verlassen das eigene System nicht." },
+    kivo: { stufe: "nicht betroffen", ton: 1, satz: "Von Menschen festgelegte Regeln gelten nach der Begriffsbestimmung der Verordnung in der Regel nicht als KI-System." } },
+  { id: "erp", titel: "Schnittstelle zum ERP mit Vorschlag und Freigabe", art: "Automatisierung, KI nur als Vorschlag (Schritt 3)",
+    start: { nutzen: 3, aufwand: 3, risiko: 2 },
+    satz: {
+      nutzen: "Die doppelte Erfassung entfällt, Übertragungsfehler zwischen Mail und ERP werden seltener.",
+      aufwand: "Hängt von Schnittstellen, Stammdatenqualität und Berechtigungen des ERP ab, das ist offen.",
+      risiko: "Ein falscher Datensatz wirkt bis in Einkauf und Fertigung, darum nur Entwurf und Freigabe durch den Menschen."
+    },
+    datenschutz: { stufe: "beachten", ton: 2, satz: "Kundenstammdaten werden übertragen. Rechte und Protokollierung festlegen." },
+    geheimhaltung: { stufe: "mittel", ton: 2, satz: "Die Daten bleiben im eigenen Netz, sofern das ERP intern betrieben wird." },
+    kivo: { stufe: "begrenzt", ton: 2, satz: "KI liefert nur einen Vorschlag, die Entscheidung trifft der Mensch." } },
+  { id: "rag", titel: "Informationssuche in Datenblättern und Dokumenten (RAG)", art: "KI: Suche mit Sprachmodell und Zugriffsrechten (kein eigener Demoschritt)",
+    start: { nutzen: 2, aufwand: 2, risiko: 2 },
+    satz: {
+      nutzen: "Technik und Vertrieb finden ähnliche Varianten, Prüfberichte und Datenblätter schneller.",
+      aufwand: "Dokumente müssen erschlossen, aktuell gehalten und mit Zugriffsrechten versehen werden.",
+      risiko: "Antworten können falsch oder veraltet sein, darum immer mit Quellenangabe."
+    },
+    datenschutz: { stufe: "beachten", ton: 2, satz: "Die Zugriffsrechte der fragenden Person müssen auch in der Suche gelten." },
+    geheimhaltung: { stufe: "erhöht", ton: 3, satz: "Entwicklungsunterlagen sind vertraulich. Lokale Verarbeitung oder Vertrag prüfen." },
+    kivo: { stufe: "begrenzt", ton: 2, satz: "Interner Assistent mit Hinweis, dass die Antwort von einer KI stammt. Einordnung im Einzelfall prüfen." } }
+];
+
+/* ============================================================
+   Zustand. Nichts wird gespeichert, alles liegt nur im Speicher dieses Fensters.
+   ============================================================ */
+const S = {
+  screen: 0, maxScreen: 0,
+  caseId: null, betreff: "", text: "",
+  ex: { f: {}, hits: [] },
+  erp: { spannung: "", strom: "", menge: "", termin: "" },
+  freigegeben: false,
+  timesKey: null, times: [], waste: [],
+  uc: ANSAETZE.map(a => Object.assign({}, a.start))
+};
+
+/* ============================================================
+   Hilfen
+   ============================================================ */
+const $ = (sel, root = document) => root.querySelector(sel);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+const fmt = n => (Math.round(n * 10) / 10).toLocaleString("de-DE");
+const pct = n => Math.round(n * 100) + " %";
+const pad = n => String(n).padStart(2, "0");
+const isoAus = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const dateAus = iso => { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d); };
+const deDatum = iso => { const [y, m, d] = iso.split("-"); return `${d}.${m}.${y}`; };
+const heute = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
+const uniq = a => [...new Set(a)];
+const zahl = s => {
+  const w = ZAHLWORTE[String(s).toLowerCase()];
+  if (w) return w;
+  const t = /^\d{1,3}(\.\d{3})+$/.test(s) ? s.replace(/\./g, "") : String(s).replace(",", ".");
+  return parseFloat(t);
+};
+const parseWert = v => { const n = parseFloat(String(v).replace(",", ".")); return isFinite(n) ? n : NaN; };
+const full = () => S.caseId === "frei" ? S.text : "Betreff: " + S.betreff + "\n\n" + S.text;
+
+function quartal(q, y) {
+  const iso = `${y}-${pad((q - 1) * 3 + 1)}-01`;
+  return { iso, anzeige: `Q${q} ${y} (ab ${deDatum(iso)})` };
+}
+function kalenderwoche(w, y) {
+  if (w < 1 || w > 53) return null;
+  const montag = jahr => { const j4 = new Date(jahr, 0, 4); const d = new Date(j4); d.setDate(j4.getDate() - ((j4.getDay() + 6) % 7) + (w - 1) * 7); return d; };
+  let d = montag(y || heute().getFullYear());
+  if (!y && d < heute()) d = montag(heute().getFullYear() + 1);
+  const iso = isoAus(d);
+  return { iso, anzeige: `KW ${w} (Montag ${deDatum(iso)})` };
+}
+function datum(y, m, d) {
+  const dt = new Date(y, m - 1, d);
+  if (dt.getMonth() !== m - 1) return null;
+  const iso = isoAus(dt);
+  return { iso, anzeige: deDatum(iso) };
+}
+function plusTage(n) {
+  const d = heute(); d.setDate(d.getDate() + n);
+  const iso = isoAus(d);
+  return { iso, anzeige: `${deDatum(iso)} (heute plus ${n} Tage)` };
+}
+
+/* ============================================================
+   Regel-Engine (Simulation der Dokumentenauswertung)
+   ============================================================ */
+function auswerten(text) {
+  const f = {}, hits = [];
+  const hit = (m, feld) => hits.push({ i: m.index, len: m[0].length, feld });
+  let m;
+  if ((m = R.spannung.exec(text))) { const v = zahl(m[1]); f.spannung = { wert: v, anzeige: fmt(v) + " V DC", treffer: m[0] }; hit(m, "spannung"); }
+  if ((m = R.strom.exec(text))) { const v = zahl(m[1]); f.strom = { wert: v, anzeige: fmt(v) + " A", treffer: m[0] }; hit(m, "strom"); }
+  for (const re of R.mengeJahr) {
+    if (!f.menge && (m = re.exec(text))) { const v = zahl(m[1]); f.menge = { wert: v, jahr: true, anzeige: v.toLocaleString("de-DE") + " Stück pro Jahr", treffer: m[0] }; hit(m, "menge"); }
+  }
+  if (!f.menge && (m = R.mengeGesamt.exec(text))) {
+    const v = zahl(m[1]);
+    f.menge = { wert: v, jahr: false, anzeige: v.toLocaleString("de-DE") + " Stück gesamt", treffer: m[0], hinweis: "Gesamtmenge ohne Jahresbezug" };
+    hit(m, "menge");
+  }
+  for (const r of TERMIN_REGELN) {
+    if (f.termin) break;
+    if ((m = r.re.exec(text))) { const t = r.f(m); if (t) { f.termin = { wert: t.iso, anzeige: t.anzeige, treffer: m[0], regel: r.name }; hit(m, "termin"); } }
+  }
+  for (const r of UMFELD_REGELN) {
+    const ms = [...text.matchAll(r.re)];
+    if (ms.length) { f.umfeld = { wert: r.wert, anzeige: r.wert, treffer: uniq(ms.map(x => x[0])).join(", ") }; ms.forEach(x => hit(x, "umfeld")); break; }
+  }
+  const sonder = [], sTreffer = [];
+  for (const r of SONDER_REGELN) {
+    const ms = [...text.matchAll(r.re)];
+    if (ms.length) { sonder.push(r.wert); sTreffer.push(ms[0][0]); ms.forEach(x => hit(x, "sonder")); }
+  }
+  if (sonder.length) f.sonder = { wert: sonder, anzeige: sonder.join(", "), treffer: sTreffer.join(", ") };
+  const ns = [...text.matchAll(R.normen)];
+  if (ns.length) { const w = uniq(ns.map(x => x[0].replace(/\s+/g, " "))); f.normen = { wert: w, anzeige: w.join(", "), treffer: w.join(", ") }; ns.forEach(x => hit(x, "normen")); }
+  const bs = [...text.matchAll(R.bauraum)];
+  if (bs.length) { f.bauraum = { wert: true, anzeige: "Hinweis auf Bauraum, keine Maße", treffer: uniq(bs.map(x => x[0])).join(", ") }; bs.forEach(x => hit(x, "bauraum")); }
+  return { f, hits };
+}
+
+/* Qualifizierung: Ampel mit Begründung, kein Kundenscore */
+function qualifizieren(f) {
+  const gefunden = PFLICHT.filter(k => f[k]);
+  const fehlend = PFLICHT.filter(k => !f[k]);
+  const vollst = gefunden.length / PFLICHT.length;
+  const medizin = (f.umfeld && f.umfeld.wert === "Medizintechnik") || (f.normen && f.normen.wert.some(n => /60601/.test(n)));
+  const nSonder = (f.sonder ? f.sonder.wert.length : 0) + (medizin ? Q.MEDIZIN_ZUSCHLAG : 0);
+  const aufwand = nSonder >= Q.AUFWAND_HOCH_AB ? "hoch" : nSonder >= Q.AUFWAND_MITTEL_AB ? "mittel" : "niedrig";
+  const potenzial = !(f.menge && f.menge.jahr) ? "unbekannt" : f.menge.wert >= Q.POT_HOCH_AB ? "hoch" : f.menge.wert >= Q.POT_MITTEL_AB ? "mittel" : "niedrig";
+  const wochen = f.termin ? (dateAus(f.termin.wert) - heute()) / (7 * 864e5) : null;
+  const dringlich = wochen === null ? "unbekannt" : wochen < Q.DRINGEND_UNTER_WOCHEN ? "hoch" : "normal";
+  let code, gruende = [];
+  if (vollst < Q.VOLLST_MIN) {
+    code = "rueckfrage";
+    gruende.push(`Vollständigkeit ${pct(vollst)} liegt unter ${pct(Q.VOLLST_MIN)}. Es fehlen: ${fehlend.map(k => FELD[k]).join(", ")}.`);
+  } else if (f.menge && f.menge.wert < Q.STANDARD_MENGE_UNTER && nSonder === 0) {
+    code = "standard";
+    gruende.push(`Menge ${f.menge.wert.toLocaleString("de-DE")} Stück liegt unter ${Q.STANDARD_MENGE_UNTER}, und es sind keine Sonderwünsche erkannt.`);
+    gruende.push("Ein Standardnetzteil deckt die Anforderung voraussichtlich ab. Eine Sonderanfertigung lohnt sich bei dieser Menge weder für den Kunden noch für den Hersteller.");
+  } else {
+    code = "weiter";
+    gruende.push(`Vollständigkeit ${pct(vollst)}, ${nSonder} Sonderwünsche (Aufwand ${aufwand}), Potenzial ${potenzial}.`);
+    gruende.push("Die Anfrage ist vollständig genug für eine technische Prüfung und die Vorbereitung im ERP.");
+  }
+  if (dringlich === "hoch") gruende.push(`Dringlichkeit hoch: Der Zieltermin liegt weniger als ${Q.DRINGEND_UNTER_WOCHEN} Wochen entfernt.`);
+  return { code, vollst, gefunden, fehlend, medizin, nSonder, aufwand, potenzial, wochen, dringlich, gruende };
+}
+
+/* ERP-Vorschau: Prüfregeln vor der Übergabe */
+function pruefen(e) {
+  const err = [];
+  const leer = v => String(v).trim() === "";
+  const p = [["spannung", "Ausgangsspannung"], ["strom", "Ausgangsstrom"], ["menge", "Menge"], ["termin", "Wunschtermin"]];
+  for (const [k, n] of p) if (leer(e[k])) err.push({ feld: k, text: `${n}: Pflichtfeld ist leer.` });
+  if (!S.ex.f.umfeld) err.push({ feld: "umfeld", text: "Einsatzumfeld: Pflichtfeld ist leer." });
+  const u = parseWert(e.spannung), i = parseWert(e.strom), q = parseWert(e.menge);
+  if (!leer(e.spannung) && !(u >= CHECK.U_MIN && u <= CHECK.U_MAX)) err.push({ feld: "spannung", text: `Ausgangsspannung ${isNaN(u) ? "ist keine Zahl" : fmt(u) + " V liegt außerhalb von " + CHECK.U_MIN + " bis " + CHECK.U_MAX + " V"}.` });
+  if (!leer(e.strom) && !(i >= CHECK.I_MIN && i <= CHECK.I_MAX)) err.push({ feld: "strom", text: `Ausgangsstrom ${isNaN(i) ? "ist keine Zahl" : fmt(i) + " A liegt außerhalb von " + fmt(CHECK.I_MIN) + " bis " + CHECK.I_MAX + " A"}.` });
+  if (!leer(e.menge) && !(q > 0)) err.push({ feld: "menge", text: "Menge muss größer 0 sein." });
+  if (!leer(e.termin) && !(/^\d{4}-\d{2}-\d{2}$/.test(e.termin) && e.termin > isoAus(heute()))) err.push({ feld: "termin", text: "Wunschtermin muss in der Zukunft liegen." });
+  return err;
+}
+
+function erpDaten() {
+  const f = S.ex.f, e = S.erp;
+  const status = S.freigegeben ? "zur Übernahme freigegeben" : "Entwurf";
+  const u = parseWert(e.spannung), i = parseWert(e.strom), q = parseWert(e.menge);
+  const bez = `Netzteil ${isNaN(u) ? "?" : fmt(u)} V DC ${isNaN(i) ? "?" : fmt(i)} A, kundenspezifisch`;
+  return {
+    kundenauftrag: {
+      auftragsnummer: "(Platzhalter, vergibt das ERP)",
+      kunde: "(Platzhalter, aus dem Kundenstamm)",
+      status,
+      positionen: [{
+        position: 10,
+        artikelreferenz: "NEU-0001 (Artikel-Entwurf)",
+        menge: isNaN(q) ? null : q,
+        mengeneinheit: f.menge && f.menge.jahr ? "Stück pro Jahr (Bedarf laut Anfrage)" : "Stück",
+        wunschtermin: e.termin || null
+      }]
+    },
+    artikel: {
+      artikelreferenz: "NEU-0001",
+      bezeichnung: bez,
+      ausgangsspannung_v: isNaN(u) ? null : u,
+      ausgangsstrom_a: isNaN(i) ? null : i,
+      variante: "kundenspezifisch",
+      einsatzumfeld: f.umfeld ? f.umfeld.wert : null,
+      normen: f.normen ? f.normen.wert : [],
+      sonderwuensche: f.sonder ? f.sonder.wert : [],
+      status
+    },
+    aufgabe_arbeitsvorbereitung: {
+      aufgaben: ["Stückliste anlegen", "Arbeitsplan prüfen"],
+      bezug: "NEU-0001",
+      status: S.freigegeben ? "offen" : "Entwurf"
+    }
+  };
+}
+
+/* Prozess: Startwerte je Entscheidung */
+function ensureTimes() {
+  const code = qualifizieren(S.ex.f).code;
+  const key = S.caseId + ":" + code;
+  if (S.timesKey === key) return;
+  S.timesKey = key;
+  const skip = NICHT_DURCHLAUFEN[code];
+  S.times = PROZESS.map(p => skip.includes(p.id) ? [0, 0] : [p.min, p.std]);
+  S.waste = PROZESS.map(p => new Set(skip.includes(p.id) ? [] : p.waste));
+}
+function totals() {
+  const b = S.times.reduce((a, t) => a + (+t[0] || 0) / 60, 0);
+  const w = S.times.reduce((a, t) => a + (+t[1] || 0), 0);
+  let iw = 0; S.times.forEach((t, k) => { if ((+t[1] || 0) > (+S.times[iw][1] || 0)) iw = k; });
+  return { b, w, d: b + w, anteil: (b + w) ? w / (b + w) : 0, iw };
+}
+
+const ucPunkte = u => u.nutzen + (4 - u.aufwand) + (4 - u.risiko);
+const ucKlasse = p => p >= UC.PILOT_AB ? "pilot" : p >= UC.DANACH_AB ? "danach" : "zurueck";
+
+/* ============================================================
+   Darstellung
+   ============================================================ */
+const NAV = ["Start", "1 Eingang", "2 Qualifizieren", "3 Übergabe ERP", "4 Prozess", "5 KI-Chancen", "Ergebnis"];
+const TITEL = [
+  "",
+  "Schritt 1: Eingang, die Anfrage wird ausgewertet",
+  "Schritt 2: Qualifizieren, wie geht es weiter?",
+  "Schritt 3: Übergabe ans ERP (Vorschau)",
+  "Schritt 4: Prozess ansehen, wo wartet die Anfrage?",
+  "Schritt 5: KI-Chancen bewerten"
+];
+const LEAD = [
+  "",
+  "Die Anfrage kommt per Mail. Regeln lesen die wichtigsten Angaben heraus und übernehmen sie in Felder. Was gefunden wurde, ist markiert. Was fehlt, steht als „nicht gefunden“ da.",
+  "Ist die Anfrage vollständig, wie aufwendig ist sie, lohnt sie sich als Sonderanfertigung? Das Ergebnis ist eine Ampel mit Begründung, kein Kundenscore.",
+  "Für Anfragen mit „Weiter“ entsteht ein Entwurf für Kundenauftrag und Artikel. Prüfregeln halten falsche Werte auf, ein Mensch gibt frei.",
+  "Wie lange dauert eine Anfrage vom Eingang bis zur Freigabe, und wie viel davon ist Warten? Stellen Sie die Zeiten nach Ihrer Erfahrung ein.",
+  "Wo würde KI helfen, wo reicht Digitalisierung? Vier Ansätze, bewertet nach Nutzen, Aufwand, Risiko, Datenschutz, Geheimhaltung und EU-KI-Verordnung."
+];
+
+function renderProgress() {
+  $("#progress").innerHTML = NAV.map((n, i) =>
+    `<li><button type="button" data-go="${i}" ${i > S.maxScreen ? "disabled" : ""} class="${i < S.screen ? "done" : ""}" ${i === S.screen ? 'aria-current="step"' : ""}>${esc(n)}</button></li>`
+  ).join("");
+}
+
+function go(i) {
+  S.screen = i; S.maxScreen = Math.max(S.maxScreen, i);
+  render();
+  $("#main").focus({ preventScroll: true });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function render() {
+  renderProgress();
+  const m = $("#main");
+  if (S.screen === 0) m.innerHTML = viewStart();
+  else if (S.screen <= 5) m.innerHTML = viewStep(S.screen);
+  else m.innerHTML = viewErgebnis();
+  document.title = (S.screen === 0 ? "Start" : NAV[S.screen]) + " | Von der Kundenanfrage zum Auftrag";
+}
+
+function navButtons(back, next, nextLabel, nextDisabled) {
+  return `<div class="navbtns">
+    ${back !== null ? `<button type="button" class="btn sec" data-go="${back}">Zurück</button>` : "<span></span>"}
+    ${next !== null ? `<button type="button" class="btn" data-go="${next}" ${nextDisabled ? "disabled" : ""}>${esc(nextLabel)}</button>` : ""}
+  </div>`;
+}
+const kiHead = t => `<h3>${esc(t)} <span class="simbadge">Simulation</span></h3>`;
+const regeln = inhalt => `<details class="rules"><summary>So entscheidet die Demo (für Fachbereich und IT)</summary>${inhalt}</details>`;
+const muster = re => `<span class="rule">${esc(re.source)}</span>`;
+
+/* ---------- Start ---------- */
+function viewStart() {
+  const cards = Object.entries(CASES).map(([id, c]) =>
+    `<button type="button" class="case" data-case="${id}" aria-pressed="${S.caseId === id}">
+      <span class="tag">${esc(c.tag)}</span><strong>${esc(c.betreff)}</strong><span class="d">${esc(c.kurz)}</span></button>`).join("");
+  return `
+  <h2>Worum es geht</h2>
+  <p class="lead">Ein Hersteller kundenspezifischer Netzteile, die ${esc(FIRMA)}, erhält Anfragen per Mail.
+  Sie spielen eine Anfrage in fünf Schritten durch: auswerten, qualifizieren, ans ERP übergeben, den Prozess ansehen und KI-Ansätze bewerten. Dauer etwa 5 bis 10 Minuten.</p>
+  <div class="grid3" style="margin-bottom:14px">
+    <div class="panel mensch" style="margin:0"><h3>Der Mensch entscheidet</h3>Die Demo bereitet vor. Freigaben gibt immer ein Mensch.</div>
+    <div class="panel ki" style="margin:0">${kiHead("KI-Schritte")}Feste Regeln statt Sprachmodell, offen angezeigt. Keine echten Daten, kein echtes ERP.</div>
+    <div class="panel lean" style="margin:0"><h3>Zwei Ebenen</h3>Kurze Texte für den Überblick. Je Schritt aufklappbar: „So entscheidet die Demo“ mit Regeln, Feldern und Schwellenwerten.</div>
+  </div>
+  <h3>Anfrage wählen</h3>
+  <div class="grid3">${cards}</div>
+  <div class="card" style="margin-top:14px">
+    <button type="button" class="case" data-case="frei" aria-pressed="${S.caseId === "frei"}" style="height:auto">
+      <span class="tag">Eigene Anfrage</span><strong>Eigene Anfrage einfügen</strong>
+      <span class="d">Die regelbasierte Erkennung findet nur, was in den Regeln steht. Ein freier Text kann unvollständig ausgewertet werden.</span></button>
+  </div>
+  <p class="note">Alle Anfragen, Firmen und Zeiten sind erfunden.</p>
+  ${navButtons(null, 1, "Durchlauf starten", !S.caseId)}`;
+}
+
+function chooseCase(id) {
+  S.caseId = id;
+  if (id === "frei") { S.betreff = ""; S.text = ""; }
+  else { S.betreff = CASES[id].betreff; S.text = CASES[id].text; }
+  neuAuswerten();
+  S.timesKey = null;
+  S.uc = ANSAETZE.map(a => Object.assign({}, a.start));
+  S.maxScreen = 0;
+}
+function neuAuswerten() {
+  S.ex = auswerten(full());
+  const f = S.ex.f;
+  S.erp = {
+    spannung: f.spannung ? String(f.spannung.wert) : "",
+    strom: f.strom ? String(f.strom.wert) : "",
+    menge: f.menge ? String(f.menge.wert) : "",
+    termin: f.termin ? f.termin.wert : ""
+  };
+  S.freigegeben = false;
+}
+
+/* ---------- Schritte ---------- */
+function viewStep(n) {
+  let body = "";
+  if (n === 1) body = stepEingang();
+  if (n === 2) body = stepQualifizieren();
+  if (n === 3) body = stepErp();
+  if (n === 4) body = stepProzess();
+  if (n === 5) body = stepKi();
+  const blocked = n === 1 && !full().trim();
+  const nextLabel = n === 5 ? "Zum Ergebnis" : "Weiter zu " + NAV[n + 1].replace(/^\d /, "");
+  return `<h2>${esc(TITEL[n])}</h2><p class="lead">${esc(LEAD[n])}</p>${body}${navButtons(n - 1, n + 1, nextLabel, blocked)}`;
+}
+
+/* Text mit markierten Treffern */
+function markiert(text, hits) {
+  const hs = hits.slice().sort((a, b) => a.i - b.i || b.len - a.len);
+  let out = "", pos = 0;
+  for (const h of hs) {
+    if (h.i < pos) continue;
+    out += esc(text.slice(pos, h.i)) + `<mark class="hl">${esc(text.slice(h.i, h.i + h.len))}<small>${esc(KURZ[h.feld])}</small></mark>`;
+    pos = h.i + h.len;
+  }
+  return out + esc(text.slice(pos));
+}
+
+function feldZeile(k) {
+  const v = S.ex.f[k];
+  const pf = PFLICHT.includes(k) ? `<span class="pfl">Pflichtfeld</span>` : "";
+  return `<tr><td>${esc(FELD[k])}${pf}</td>
+    <td>${v ? `<span class="ok">gefunden</span> ${esc(v.anzeige)}${v.hinweis ? `<span class="pfl">${esc(v.hinweis)}</span>` : ""}` : `<span class="nf">nicht gefunden</span>`}</td>
+    <td class="tr">${v ? "„" + esc(v.treffer) + "“" : ""}</td></tr>`;
+}
+
+function eingangOut() {
+  const txt = full();
+  const n = PFLICHT.filter(k => S.ex.f[k]).length;
+  const extra = ["sonder", "normen"].concat(S.ex.f.bauraum ? ["bauraum"] : []);
+  return `<div class="grid2">
+    <div class="card"><h3>Eingegangene Anfrage</h3>
+      <div class="mail">${txt.trim() ? markiert(txt, S.ex.hits) : '<span class="hint">Noch kein Text.</span>'}</div>
+      <p class="hint">Markiert sind Textstellen, die eine Regel erkannt hat.</p></div>
+    <div class="panel ki" style="margin:0 0 14px">${kiHead("Erkannte Felder")}
+      <p style="margin:0 0 6px"><b>${n} von ${PFLICHT.length} Pflichtfeldern gefunden.</b></p>
+      <div class="scroll"><table class="ft"><thead><tr><th scope="col">Feld</th><th scope="col">Wert</th><th scope="col" class="tr">Treffer im Text</th></tr></thead>
+      <tbody>${PFLICHT.concat(extra).map(feldZeile).join("")}</tbody></table></div>
+      <p class="hint">In einer echten Lösung würde hier ein Sprachmodell lesen, auch Anhänge und Datenblätter. Die Demo nutzt feste Regeln.</p>
+    </div></div>`;
+}
+
+function stepEingang() {
+  const frei = S.caseId === "frei";
+  const eingabe = frei ? `<div class="card">
+      <label class="f" for="freitext" style="margin-top:0">Ihre Anfrage</label>
+      <textarea id="freitext" maxlength="2000" data-freitext placeholder="Zum Beispiel: Wir suchen ein Netzteil 48 V DC, 5 A, etwa 300 Stück pro Jahr, Start Q2 2027, Einsatz in der Bahntechnik.">${esc(S.text)}</textarea>
+      <p class="hint">Der Text bleibt in diesem Browserfenster.</p></div>
+    <div class="panel warn"><b>Hinweis:</b> Die regelbasierte Erkennung findet nur, was in den Regeln steht. Ein freier Text kann unvollständig ausgewertet werden. Die Regeln sehen Sie unten unter „So entscheidet die Demo“.</div>` : "";
+  const termin = TERMIN_REGELN.map(r => `<li>${esc(r.name)}: ${esc(r.beispiel)}<br>${muster(r.re)}</li>`).join("");
+  const umfeld = UMFELD_REGELN.map(r => `<li><span class="rule">${esc(r.kern)}</span> ergibt „${esc(r.wert)}“</li>`).join("");
+  const sonder = SONDER_REGELN.map(r => `<li><span class="rule">${esc(r.kern)}</span> ergibt „${esc(r.wert)}“</li>`).join("");
+  return `${eingabe}<div id="eingang-out" aria-live="polite">${eingangOut()}</div>
+  ${regeln(`
+    <p style="margin:0">Pflichtfelder (${PFLICHT.length}): ${PFLICHT.map(k => FELD[k]).join(", ")}. Jede Regel nimmt den ersten Treffer im Text.</p>
+    <h4>Ausgangsspannung</h4><ul><li>Zahl vor „V“, optional „DC“. Angaben mit „AC“ gelten als Eingangsspannung und zählen nicht.<br>${muster(R.spannung)}</li></ul>
+    <h4>Ausgangsstrom</h4><ul><li>Zahl vor „A“.<br>${muster(R.strom)}</li></ul>
+    <h4>Stückzahl</h4><ul><li>Pro Jahr: Zahl oder Zahlwort vor „Stück pro Jahr“ oder „pro Jahr“, „jährlich“.<br>${muster(R.mengeJahr[0])}<br>${muster(R.mengeJahr[1])}</li>
+      <li>Sonst Zahl vor „Stück“ als Gesamtmenge ohne Jahresbezug (Hinweis im Feld).<br>${muster(R.mengeGesamt)}</li>
+      <li>Zahlwörter: ${esc(Object.keys(ZAHLWORTE).join(", "))}</li></ul>
+    <h4>Zieltermin (erste passende Regel in dieser Reihenfolge)</h4><ul>${termin}</ul>
+    <p class="hint">Schlagwörter: Treffer ist das ganze Wort, das einen der Wortteile enthält, Groß- und Kleinschreibung egal. Beispiel: „Diagnosegerät“ enthält „diagnose“.</p>
+    <h4>Einsatzumfeld (erste passende Regel in dieser Reihenfolge)</h4><ul>${umfeld}</ul>
+    <h4>Sonderwünsche (alle Treffer zählen)</h4><ul>${sonder}</ul>
+    <h4>Normen</h4><ul><li>IEC, EN, DIN EN oder UL mit Nummer.<br>${muster(R.normen)}</li></ul>
+    <h4>Bauraum (nur für Rückfragen)</h4><ul><li>${muster(R.bauraum)} erzeugt eine Rückfrage nach den Maßen.</li></ul>`)}`;
+}
+
+function rueckfrageEntwurf(qf) {
+  const fragen = qf.fehlend.map(k => RUECKFRAGEN[k]);
+  if (S.ex.f.bauraum) fragen.push(RUECKFRAGEN.bauraum);
+  const betreff = S.betreff || "Ihre Anfrage";
+  return `Betreff: Rückfrage zu „${betreff}“
+
+Sehr geehrte Damen und Herren,
+
+vielen Dank für Ihre Anfrage. Damit wir Ihnen ein passendes Angebot machen können, benötigen wir noch folgende Angaben:
+
+${fragen.map((q, i) => (i + 1) + ". " + q).join("\n")}
+
+Mit freundlichen Grüßen
+Vertriebsinnendienst, ${FIRMA}`;
+}
+
+function stepQualifizieren() {
+  const qf = qualifizieren(S.ex.f), e = ENTSCHEIDUNG[qf.code], f = S.ex.f;
+  const tile = (l, v, r) => `<div class="tile"><div class="l">${l}</div><div class="v">${v}</div><div class="r">${r}</div></div>`;
+  const menge = f.menge ? f.menge.anzeige : "keine Angabe";
+  let folge = "";
+  if (qf.code === "rueckfrage") folge = `<div class="panel mensch"><h3>Rückfrage an den Kunden (Entwurf)</h3>
+    <div class="entwurf">${esc(rueckfrageEntwurf(qf))}</div>
+    <p class="hint">Aus den fehlenden Pflichtfeldern erzeugt. Ein Mensch prüft und versendet. Die Demo versendet nichts.</p></div>`;
+  if (qf.code === "standard") folge = `<div class="panel mensch"><h3>Umleitung an den Standardvertrieb</h3>
+    <p style="margin:0">Antwort an den Kunden mit Verweis auf passende Standardnetzteile (${esc(f.spannung ? f.spannung.anzeige : "")}${f.strom ? ", " + esc(f.strom.anzeige) : ""}). Keine technische Prüfung, keine Daten im ERP für eine Sonderanfertigung.</p>
+    <p class="hint">Die Entscheidung trifft der Mensch. Die Regel macht nur den Vorschlag.</p></div>`;
+  if (qf.code === "weiter") folge = `<div class="panel mensch"><h3>Nächster Schritt</h3>
+    <p style="margin:0">Technik prüft die Machbarkeit, die Arbeitsvorbereitung bereitet Stückliste und Arbeitsplan vor. Dafür entsteht im nächsten Schritt ein Entwurf für das ERP.</p></div>`;
+  return `
+  <div class="ampel ${e.ampel}" role="status"><span class="dot" aria-hidden="true"></span><div>
+    <h3>Entscheidung: ${esc(e.titel)}</h3>
+    <ul style="margin:0;padding-left:18px">${qf.gruende.map(g => `<li>${esc(g)}</li>`).join("")}</ul></div></div>
+  <div class="grid4" style="margin-bottom:14px">
+    ${tile("Vollständigkeit", pct(qf.vollst), `${qf.gefunden.length} von ${PFLICHT.length} Pflichtfeldern`)}
+    ${tile("Aufwand", esc(qf.aufwand), `${qf.nSonder} Sonderwünsche${qf.medizin ? ", davon 1 für Medizintechnik oder IEC 60601" : ""}`)}
+    ${tile("Potenzial", esc(qf.potenzial), esc(f.menge && f.menge.jahr ? menge : (f.menge ? menge + ", ohne Jahresmenge" : "ohne Jahresmenge")))}
+    ${tile("Dringlichkeit", esc(qf.dringlich), esc(f.termin ? "Zieltermin " + f.termin.anzeige : "kein Termin genannt"))}
+  </div>
+  ${folge}
+  ${regeln(`
+    <table><tbody>
+      <tr><th scope="row">Vollständigkeit</th><td>gefundene Pflichtfelder geteilt durch ${PFLICHT.length}</td></tr>
+      <tr><th scope="row">Aufwand</th><td>Anzahl Sonderwünsche: 0 niedrig, ${Q.AUFWAND_MITTEL_AB} bis ${Q.AUFWAND_HOCH_AB - 1} mittel, ab ${Q.AUFWAND_HOCH_AB} hoch. Medizintechnik oder Norm 60601 zählt als ${Q.MEDIZIN_ZUSCHLAG} weiterer Sonderwunsch.</td></tr>
+      <tr><th scope="row">Potenzial</th><td>Jahresmenge ab ${Q.POT_HOCH_AB} hoch, ${Q.POT_MITTEL_AB} bis ${Q.POT_HOCH_AB - 1} mittel, darunter niedrig. Ohne Jahresmenge: unbekannt.</td></tr>
+      <tr><th scope="row">Dringlichkeit</th><td>Zieltermin in weniger als ${Q.DRINGEND_UNTER_WOCHEN} Wochen: hoch, sonst normal.</td></tr>
+    </tbody></table>
+    <h4>Entscheidung (Reihenfolge der Prüfung)</h4>
+    <ol style="margin:4px 0;padding-left:20px;font-size:.9rem">
+      <li>Vollständigkeit unter ${pct(Q.VOLLST_MIN)}: „${esc(ENTSCHEIDUNG.rueckfrage.titel)}“, Rückfragenentwurf aus den fehlenden Feldern.</li>
+      <li>Menge unter ${Q.STANDARD_MENGE_UNTER} Stück und keine Sonderwünsche: „${esc(ENTSCHEIDUNG.standard.titel)}“.</li>
+      <li>Sonst: „${esc(ENTSCHEIDUNG.weiter.titel)}“.</li>
+    </ol>
+    <p class="hint">Potenzial und Dringlichkeit ändern die Entscheidung nicht. Sie helfen bei der Reihenfolge der Bearbeitung. Es entsteht kein Kundenscore und kein Eintrag in einem CRM.</p>`)}`;
+}
+
+/* ---------- Schritt 3: ERP ---------- */
+function erpOut() {
+  const err = pruefen(S.erp);
+  const d = erpDaten();
+  const pos = d.kundenauftrag.positionen[0], a = d.artikel;
+  const kv = o => `<dl class="kv">${o.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v === null || v === "" ? "leer" : v)}</dd>`).join("")}</dl>`;
+  const status = `<span class="status ${S.freigegeben ? "frei" : ""}">${esc(d.kundenauftrag.status)}</span>`;
+  const pruef = err.length
+    ? `<div class="panel warn" role="alert"><b>Freigabe blockiert.</b> ${err.length === 1 ? "Eine Prüfregel ist" : err.length + " Prüfregeln sind"} verletzt:<ul class="errs">${err.map(x => `<li>${esc(x.text)}</li>`).join("")}</ul></div>`
+    : `<div class="panel lean" role="status"><b>Alle Prüfregeln erfüllt.</b> Der Entwurf kann freigegeben werden.</div>`;
+  return `${pruef}
+  <div class="grid2">
+    <div>
+      <div class="card"><h3>Kundenauftrag (Entwurf) ${status}</h3>${kv([
+        ["Auftragsnummer", d.kundenauftrag.auftragsnummer], ["Kunde", d.kundenauftrag.kunde], ["Position", pos.position],
+        ["Artikelreferenz", pos.artikelreferenz], ["Menge", pos.menge === null ? null : pos.menge.toLocaleString("de-DE") + " " + pos.mengeneinheit],
+        ["Wunschtermin", pos.wunschtermin ? deDatum(pos.wunschtermin) : null]])}</div>
+      <div class="card"><h3>Artikel-Stammdaten (Entwurf) ${status}</h3>${kv([
+        ["Bezeichnung", a.bezeichnung], ["Ausgangsspannung", a.ausgangsspannung_v === null ? null : fmt(a.ausgangsspannung_v) + " V DC"],
+        ["Ausgangsstrom", a.ausgangsstrom_a === null ? null : fmt(a.ausgangsstrom_a) + " A"], ["Variante", a.variante],
+        ["Einsatzumfeld", a.einsatzumfeld], ["Normen", a.normen.join(", ") || "keine genannt"], ["Sonderwünsche", a.sonderwuensche.join(", ") || "keine"]])}</div>
+      <div class="card"><h3>Aufgabe Arbeitsvorbereitung</h3><ul style="margin:0;padding-left:20px">${d.aufgabe_arbeitsvorbereitung.aufgaben.map(x => `<li>${esc(x)} für NEU-0001</li>`).join("")}</ul>
+        <p class="hint">Als Textaufgabe, kein Verfahren im ERP.</p></div>
+    </div>
+    <div class="card"><h3>JSON-Vorschau</h3>
+      <pre class="json" tabindex="0" aria-label="JSON-Vorschau der Übergabedaten">${esc(JSON.stringify(d, null, 2))}</pre>
+      <p class="hint">So könnte eine Schnittstelle die Daten übergeben. Die Demo schreibt nirgends hin, die Vorschau ist nur eine Anzeige.</p></div>
+  </div>
+  <div class="panel mensch" id="freigabe-box" tabindex="-1"><h3>Freigabe durch den Menschen</h3>
+    <p style="margin:0 0 10px">${S.freigegeben ? "<b>Freigegeben.</b> Status: zur Übernahme freigegeben. Jede weitere Änderung setzt den Status auf Entwurf zurück." : "Erst nach der Freigabe wechselt der Status auf „zur Übernahme freigegeben“."}</p>
+    <button type="button" class="btn" data-freigabe ${err.length || S.freigegeben ? "disabled" : ""}>Freigeben (Mensch)</button>
+  </div>`;
+}
+
+function stepErp() {
+  const qf = qualifizieren(S.ex.f);
+  const hinweis = `<div class="panel lean"><b>Generisches Datenmodell, kein bestimmtes ERP-Produkt.</b> Die Demo schreibt nirgends hin, die Vorschau ist nur eine Anzeige.</div>`;
+  const rules = regeln(`
+    <h4>Prüfregeln vor der Übergabe</h4>
+    <ul><li>Alle Pflichtfelder gefüllt: Ausgangsspannung, Ausgangsstrom, Menge, Wunschtermin, Einsatzumfeld</li>
+      <li>Ausgangsspannung ${CHECK.U_MIN} bis ${CHECK.U_MAX} V</li>
+      <li>Ausgangsstrom ${fmt(CHECK.I_MIN)} bis ${CHECK.I_MAX} A</li>
+      <li>Menge größer 0</li>
+      <li>Wunschtermin in der Zukunft</li></ul>
+    <p class="hint">Ein Verstoß blockiert die Freigabe und nennt das Feld. Die Freigabe ist immer ein eigener Klick eines Menschen.</p>
+    <h4>Datenmodell (generisch)</h4>
+    <ul><li>Kundenauftrag: Auftragsnummer, Kunde, Status, Positionen (Position, Artikelreferenz, Menge, Mengeneinheit, Wunschtermin)</li>
+      <li>Artikel: Artikelreferenz, Bezeichnung, Ausgangsspannung, Ausgangsstrom, Variante, Einsatzumfeld, Normen, Sonderwünsche, Status</li>
+      <li>Aufgabe Arbeitsvorbereitung: Aufgaben, Bezug, Status</li>
+      <li>Status: Entwurf, nach Freigabe „zur Übernahme freigegeben“</li></ul>`);
+  if (qf.code !== "weiter") {
+    return `${hinweis}<div class="ampel ${ENTSCHEIDUNG[qf.code].ampel}"><span class="dot" aria-hidden="true"></span><div>
+      <h3>Für diese Anfrage entfällt die Übergabe</h3>
+      <p style="margin:0">Entscheidung in Schritt 2: „${esc(ENTSCHEIDUNG[qf.code].titel)}“. ${qf.code === "rueckfrage"
+        ? "Erst wenn die Antworten vorliegen, läuft die Anfrage erneut durch Schritt 1 und 2."
+        : "Für ein Standardprodukt wird kein neuer Artikel angelegt."} Probieren Sie die vollständige Anfrage, um die ERP-Vorschau zu sehen.</p></div></div>${rules}`;
+  }
+  const inp = (k, label, type, extra) => `<div><label class="f" for="erp-${k}">${label}</label>
+    <input id="erp-${k}" type="${type}" ${extra} value="${esc(S.erp[k])}" data-erp="${k}"></div>`;
+  return `${hinweis}
+  <div class="card"><h3>Werte prüfen und bei Bedarf korrigieren</h3>
+    <div class="grid4">
+      ${inp("spannung", "Ausgangsspannung (V)", "number", 'step="any" inputmode="decimal"')}
+      ${inp("strom", "Ausgangsstrom (A)", "number", 'step="any" inputmode="decimal"')}
+      ${inp("menge", "Menge (Stück)", "number", 'step="1" min="0" inputmode="numeric"')}
+      ${inp("termin", "Wunschtermin", "date", "")}
+    </div>
+    <p class="hint">Vorbelegt aus Schritt 1. Zum Ausprobieren: Tragen Sie bei der Spannung 500 ein.</p></div>
+  <div id="erp-out" aria-live="polite">${erpOut()}</div>
+  ${rules}`;
+}
+
+/* ---------- Schritt 4: Prozess ---------- */
+function dashOut() {
+  const tt = totals();
+  const sum = S.times.map(t => (+t[0] || 0) / 60 + (+t[1] || 0));
+  const max = Math.max(...sum, 1);
+  const rows = PROZESS.map((p, i) => {
+    const b = (+S.times[i][0] || 0) / 60, w = +S.times[i][1] || 0;
+    return `<div class="vs-row"><span>${esc(p.name)}</span>
+      <div class="bar" role="img" aria-label="${esc(p.name)}: ${fmt(b)} Stunden Bearbeitung, ${fmt(w)} Stunden Warten">
+        <div class="b" style="width:${b / max * 100}%"></div><div class="w" style="width:${w / max * 100}%"></div></div>
+      <span>${fmt(b + w)} h</span></div>`;
+  }).join("");
+  return `<div class="kpis">
+    <div class="kpi"><div class="v">${fmt(tt.d)} h</div><div class="l">Durchlaufzeit</div></div>
+    <div class="kpi"><div class="v">${fmt(tt.b)} h</div><div class="l">davon Bearbeitung</div></div>
+    <div class="kpi"><div class="v">${pct(tt.anteil)}</div><div class="l">Anteil Wartezeit (${fmt(tt.w)} h)</div></div>
+    <div class="kpi"><div class="v" style="font-size:1.1rem">${tt.w ? esc(PROZESS[tt.iw].name) : "keine"}</div><div class="l">längste Wartezeit${tt.w ? " (" + fmt(+S.times[tt.iw][1]) + " h)" : ""}</div></div>
+  </div>
+  <div class="card"><h3>Bearbeitung und Warten je Schritt</h3>${rows}
+    <div class="legend"><span><i class="lb"></i>Bearbeitung</span><span><i class="lw"></i>Wartezeit</span></div></div>`;
+}
+
+function wasteKompakt() {
+  return `<table class="wk"><tbody>${PROZESS.map((p, i) => {
+    const arten = [...S.waste[i]].map(k => `<span class="chip t2">${esc(WASTE[k].name)}</span>`).join("");
+    return `<tr><th scope="row">${esc(p.name)}</th><td>${arten || '<span class="hint">keine markiert</span>'}</td><td>${S.waste[i].size ? esc(p.beispiel) : ""}</td></tr>`;
+  }).join("")}</tbody></table>`;
+}
+
+function stepProzess() {
+  ensureTimes();
+  const code = qualifizieren(S.ex.f).code, skip = NICHT_DURCHLAUFEN[code];
+  const zeilen = PROZESS.map((p, i) => `<tr><th scope="row">${esc(p.name)}${skip.includes(p.id) ? `<span class="skip">in diesem Fall nicht durchlaufen</span>` : ""}</th>
+    <td><input type="number" min="0" max="9999" step="5" value="${S.times[i][0]}" data-zeit="${i}:0" aria-label="${esc(p.name)}: Bearbeitung in Minuten" inputmode="decimal"></td>
+    <td><input type="number" min="0" max="999" step="1" value="${S.times[i][1]}" data-zeit="${i}:1" aria-label="${esc(p.name)}: Wartezeit in Stunden" inputmode="decimal"></td></tr>`).join("");
+  const waste = PROZESS.map((p, i) => {
+    const pills = Object.entries(WASTE).map(([k, w]) =>
+      `<label class="pill ${S.waste[i].has(k) ? "on" : ""}" title="${esc(w.text)}"><input type="checkbox" data-waste="${i}:${k}" ${S.waste[i].has(k) ? "checked" : ""}>${esc(w.name)}</label>`).join("");
+    return `<tr><th scope="row" style="min-width:130px">${esc(p.name)}</th><td><div class="waste" role="group" aria-label="Verschwendungsarten ${esc(p.name)}">${pills}</div></td></tr>`;
+  }).join("");
+  return `
+  <div class="grid2">
+    <div class="card"><h3>Zeiten je Schritt</h3>
+      <div class="scroll"><table class="tt"><thead><tr><th scope="col">Schritt</th><th scope="col">Bearbeitung (Min.)</th><th scope="col">Wartezeit (Std.)</th></tr></thead><tbody>${zeilen}</tbody></table></div>
+      <p class="hint"><b>Beispielannahme</b>, keine Messung. Ändern Sie die Werte nach Ihrer Erfahrung.</p></div>
+    <div id="dash" aria-live="polite">${dashOut()}</div>
+  </div>
+  <div class="panel lean"><h3>Lean-Sicht: Verschwendungsarten je Schritt</h3>
+    <p style="margin:0 0 8px">Meist liegt der größere Hebel in der Wartezeit, nicht in schnellerer Bearbeitung. Je Schritt eine Annahme mit Beispiel.</p>
+    <div class="scroll" id="waste-kompakt">${wasteKompakt()}</div>
+    <details style="margin-top:8px"><summary style="cursor:pointer;font-weight:600;color:var(--g800)">Zuordnung ändern</summary>
+      <div class="scroll"><table class="tt"><tbody>${waste}</tbody></table></div></details></div>
+  ${regeln(`
+    <ul><li>Durchlaufzeit = Summe aller Bearbeitungszeiten (Minuten geteilt durch 60) plus Summe aller Wartezeiten (Stunden)</li>
+      <li>Anteil Wartezeit = Wartezeit geteilt durch Durchlaufzeit</li>
+      <li>Startwerte: feste Beispielannahmen je Schritt (Tabelle unten). Schritte, die nach der Entscheidung aus Schritt 2 nicht durchlaufen werden, starten mit 0.</li>
+      <li>Die Demo zeigt keine Vorher-Nachher-Werte und behauptet keine Verbesserung. Die Zahlen stammen nur aus diesen Annahmen und Ihren Eingaben.</li></ul>
+    <table><thead><tr><th>Schritt</th><th>Bearbeitung</th><th>Wartezeit</th></tr></thead><tbody>
+      ${PROZESS.map(p => `<tr><td>${esc(p.name)}</td><td>${p.min} Min.</td><td>${p.std} Std.</td></tr>`).join("")}</tbody></table>
+    <h4>Nicht durchlaufen je Entscheidung</h4>
+    <ul>${Object.entries(NICHT_DURCHLAUFEN).map(([k, v]) => `<li>${esc(ENTSCHEIDUNG[k].kurz)}: ${v.length ? esc(v.map(id => PROZESS.find(p => p.id === id).name).join(", ")) : "alle Schritte"}</li>`).join("")}</ul>
+    <h4>Acht Verschwendungsarten</h4>
+    <ul>${Object.values(WASTE).map(w => `<li><b>${esc(w.name)}:</b> ${esc(w.text)}</li>`).join("")}</ul>`)}`;
+}
+
+/* ---------- Schritt 5: KI-Chancen ---------- */
+const tonNutzen = n => 4 - n;
+const chip = (t, ton) => `<span class="chip t${ton}">${esc(t)}</span>`;
+
+function kiOut() {
+  const zeilen = ANSAETZE.map((a, i) => {
+    const u = S.uc[i], p = ucPunkte(u), k = ucKlasse(p);
+    return `<tr><td>${esc(a.titel)}</td>
+      <td>${chip(STUFE[u.nutzen], tonNutzen(u.nutzen))}</td><td>${chip(STUFE[u.aufwand], u.aufwand)}</td><td>${chip(STUFE[u.risiko], u.risiko)}</td>
+      <td>${chip(a.datenschutz.stufe, a.datenschutz.ton)}</td><td>${chip(a.geheimhaltung.stufe, a.geheimhaltung.ton)}</td><td>${chip(a.kivo.stufe, a.kivo.ton)}</td>
+      <td style="white-space:nowrap"><b>${esc(UC_TEXT[k])}</b><br><span class="hint">${p} von 9 Punkten</span></td></tr>`;
+  }).join("");
+  return `<div class="card"><h3>Bewertungsmatrix <span class="simbadge">Hypothesen</span></h3>
+    <div class="scroll"><table class="mx"><thead><tr><th scope="col">Ansatz</th><th scope="col">Nutzen</th><th scope="col">Aufwand</th><th scope="col">Risiko</th><th scope="col">Datenschutz</th><th scope="col">Geheimhaltung</th><th scope="col">KI-Verordnung</th><th scope="col">Vorschlag</th></tr></thead>
+    <tbody>${zeilen}</tbody></table></div>
+    <p class="hint">Farbe: dunkel = günstig, hell = mittel, gelb = ungünstig. Einschätzungen sind Hypothesen aus meiner Sicht, keine Aussage über ein bestimmtes Unternehmen.</p></div>`;
+}
+
+function stepKi() {
+  const sel = (i, k) => `<select data-uc="${i}:${k}" id="uc-${i}-${k}" aria-label="${esc(ANSAETZE[i].titel)}: ${k === "nutzen" ? "Nutzen" : k === "aufwand" ? "Aufwand" : "Risiko"}">${[1, 2, 3].map(v => `<option value="${v}" ${S.uc[i][k] === v ? "selected" : ""}>${STUFE[v]}</option>`).join("")}</select>`;
+  const karten = ANSAETZE.map((a, i) => {
+    const p = ucPunkte(S.uc[i]);
+    return `<div class="card uc"><h3>${i + 1}. ${esc(a.titel)}</h3><p class="art">${esc(a.art)}</p>
+      <div class="row"><b>Nutzen</b><div>${sel(i, "nutzen")} <span class="s">${esc(a.satz.nutzen)}</span></div></div>
+      <div class="row"><b>Aufwand</b><div>${sel(i, "aufwand")} <span class="s">${esc(a.satz.aufwand)}</span></div></div>
+      <div class="row"><b>Risiko</b><div>${sel(i, "risiko")} <span class="s">${esc(a.satz.risiko)}</span></div></div>
+      <div class="row"><b>Datenschutz</b><div>${chip(a.datenschutz.stufe, a.datenschutz.ton)} <span class="s">${esc(a.datenschutz.satz)}</span></div></div>
+      <div class="row"><b>Geheimhaltung</b><div>${chip(a.geheimhaltung.stufe, a.geheimhaltung.ton)} <span class="s">${esc(a.geheimhaltung.satz)}</span></div></div>
+      <div class="row"><b>KI-Verordnung</b><div>${chip(a.kivo.stufe, a.kivo.ton)} <span class="s">${esc(a.kivo.satz)}</span></div></div>
+      <div class="vorschlag" aria-live="polite">Vorschlag: <b>${esc(UC_TEXT[ucKlasse(p)])}</b> (${p} von 9 Punkten)</div></div>`;
+  }).join("");
+  return `<div id="ki-out">${kiOut()}</div>
+  <div class="grid2">${karten}</div>
+  <div class="reco">Meine Lesart: <b>Erst vereinfachen und digitalisieren, dann KI dort, wo freie Texte und Dokumente die Arbeit bremsen.</b>
+    Das Regelwerk braucht keine KI. Das Sprachmodell lohnt sich beim Lesen der Anfragen, die Schnittstelle zum ERP erst nach einem Pilot, und immer mit Freigabe durch den Menschen.</div>
+  <p></p>
+  ${regeln(`
+    <ul><li>Stufen: 1 gering, 2 mittel, 3 hoch</li>
+      <li>Punkte = Nutzen + (4 minus Aufwand) + (4 minus Risiko), höchstens 9</li>
+      <li>Ab ${UC.PILOT_AB} Punkten: „${UC_TEXT.pilot}“, ab ${UC.DANACH_AB}: „${UC_TEXT.danach}“, darunter: „${UC_TEXT.zurueck}“</li>
+      <li>Datenschutz, Geheimhaltung und EU-KI-Verordnung gehen nicht in die Punkte ein. Sie sind Bedingungen, die vor einem Pilot geklärt sein müssen.</li>
+      <li>Startwerte: ${ANSAETZE.map(a => `${esc(a.titel)} (Nutzen ${STUFE[a.start.nutzen]}, Aufwand ${STUFE[a.start.aufwand]}, Risiko ${STUFE[a.start.risiko]})`).join("; ")}</li></ul>`)}`;
+}
+
+/* ---------- Ergebnis ---------- */
+function viewErgebnis() {
+  ensureTimes();
+  const qf = qualifizieren(S.ex.f), e = ENTSCHEIDUNG[qf.code], tt = totals();
+  const fragen = qf.code === "rueckfrage" ? qf.fehlend.map(k => RUECKFRAGEN[k]).concat(S.ex.f.bauraum ? [RUECKFRAGEN.bauraum] : []) : [];
+  let daten;
+  if (qf.code === "weiter") {
+    const err = pruefen(S.erp), d = erpDaten();
+    daten = `Kundenauftrag und Artikel als Entwurf, Status: <b>${esc(d.kundenauftrag.status)}</b>. ${err.length ? `Offene Prüffehler: ${esc(err.map(x => x.text).join(" "))}` : "Alle Prüfregeln erfüllt."}`;
+  } else daten = "Entfällt, keine Übergabe ans ERP für diese Anfrage.";
+  const reihe = ANSAETZE.map((a, i) => ({ a, p: ucPunkte(S.uc[i]) })).sort((x, y) => y.p - x.p)
+    .map(x => `<li>${esc(x.a.titel)}: <b>${esc(UC_TEXT[ucKlasse(x.p)])}</b> (${x.p} von 9)</li>`).join("");
+  return `<h2>Ergebnis: ${esc(S.betreff || "Ihre Anfrage")}</h2>
+  <p class="lead">Zusammenfassung Ihres Durchlaufs. <span class="simbadge">Simulation</span> Alle Werte stammen aus festen Regeln, Beispielannahmen und Ihren Eingaben.</p>
+  <div class="ampel ${e.ampel}"><span class="dot" aria-hidden="true"></span><div><h3>Entscheidung: ${esc(e.titel)}</h3>
+    <ul style="margin:0;padding-left:18px">${qf.gruende.map(g => `<li>${esc(g)}</li>`).join("")}</ul></div></div>
+  <div class="grid2">
+    <div class="card"><h3>Offene Rückfragen</h3>${fragen.length ? `<ol style="margin:0;padding-left:20px">${fragen.map(q => `<li>${esc(q)}</li>`).join("")}</ol>` : "<p style='margin:0'>Keine.</p>"}</div>
+    <div class="card"><h3>Datenvorschau ERP</h3><p style="margin:0">${daten}</p></div>
+    <div class="card"><h3>Prozess</h3><p style="margin:0">Durchlaufzeit ${fmt(tt.d)} h, davon <b>${pct(tt.anteil)} Wartezeit</b>${tt.w ? `, am längsten in „${esc(PROZESS[tt.iw].name)}“` : ""}. Grundlage: Beispielannahmen und Ihre Eingaben, keine Messung.</p></div>
+    <div class="card"><h3>KI-Chancen, Reihenfolge</h3><ol style="margin:0;padding-left:20px">${reihe}</ol></div>
+  </div>
+  <div class="card"><h3>Was die Demo nicht zeigt</h3><ul style="margin:0;padding-left:20px">
+    <li>Kein Sprachmodell: Die Auswertung der Anfrage folgt festen Regeln.</li>
+    <li>Kein echtes ERP: Das Datenmodell ist generisch, nichts wird übertragen.</li>
+    <li>Keine Messung: Zeiten sind Annahmen, es gibt keine Aussage über eine Verbesserung.</li>
+    <li>Keine echten Kunden, Firmen oder Abläufe.</li></ul></div>
+  <details class="about"><summary>Über diese Demo</summary>
+    <p>Ich habe die Demo mit Claude Code gebaut (Agentic Coding): eine einzelne HTML-Datei ohne Server, ohne externe Bibliotheken, ohne Cookies. Ihre Eingaben bleiben in diesem Browserfenster und sind nach dem Schließen weg.</p>
+    <p>Die „KI-Schritte“ sind feste Regeln, die Sie je Schritt aufklappen können. Ein Sprachmodell ist bewusst nicht eingebaut: Die Demo soll zeigen, wie ich ein solches Vorhaben angehe, und nichts vortäuschen. Eine echte Lösung bräuchte Zugriff auf Postfach und ERP mit Rechteprüfung, eine Datenschutzprüfung, eine Einordnung nach EU-KI-Verordnung und einen Pilot mit Anwendern und Messung des Ist-Zustands.</p>
+    <p>Quellcode und Erklärung: <a href="${REPO_URL}">${esc(REPO_URL.replace("https://", ""))}</a></p>
+  </details>
+  <div class="navbtns"><button type="button" class="btn sec" data-go="5">Zurück</button>
+    <button type="button" class="btn sec" data-restart>Andere Anfrage durchspielen</button></div>`;
+}
+
+/* ============================================================
+   Ereignisse
+   ============================================================ */
+function focusSel(sel) { const n = document.querySelector(sel); if (n) n.focus({ preventScroll: true }); }
+
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-go]");
+  if (g && !g.disabled) { go(+g.dataset.go); return; }
+  const c = e.target.closest("[data-case]");
+  if (c) { chooseCase(c.dataset.case); render(); focusSel(`[data-case="${c.dataset.case}"]`); return; }
+  const fr = e.target.closest("[data-freigabe]");
+  if (fr && !fr.disabled) { S.freigegeben = true; $("#erp-out").innerHTML = erpOut(); focusSel("#freigabe-box"); return; }
+  if (e.target.closest("[data-restart]")) { S.caseId = null; S.maxScreen = 0; go(0); }
+});
+
+document.addEventListener("input", e => {
+  const el = e.target, d = el.dataset;
+  if ("freitext" in d) {
+    S.text = el.value; neuAuswerten(); S.timesKey = null;
+    $("#eingang-out").innerHTML = eingangOut();
+    const next = document.querySelector('.navbtns [data-go="2"]'); if (next) next.disabled = !full().trim();
+    return;
+  }
+  if (d.erp) {
+    S.erp[d.erp] = el.value; S.freigegeben = false;
+    $("#erp-out").innerHTML = erpOut();
+    const bad = new Set(pruefen(S.erp).map(x => x.feld));
+    document.querySelectorAll("[data-erp]").forEach(n => n.setAttribute("aria-invalid", bad.has(n.dataset.erp) ? "true" : "false"));
+    return;
+  }
+  if (d.zeit) {
+    const [i, k] = d.zeit.split(":").map(Number), v = parseFloat(el.value);
+    S.times[i][k] = isFinite(v) && v >= 0 ? Math.min(v, k ? 999 : 9999) : 0;
+    $("#dash").innerHTML = dashOut();
+  }
+});
+
+document.addEventListener("change", e => {
+  const el = e.target, d = el.dataset;
+  if (d.waste) { const [i, k] = d.waste.split(":"); el.checked ? S.waste[+i].add(k) : S.waste[+i].delete(k); el.parentElement.classList.toggle("on", el.checked); $("#waste-kompakt").innerHTML = wasteKompakt(); return; }
+  if (d.uc) {
+    const [i, k] = d.uc.split(":"); S.uc[+i][k] = +el.value;
+    const id = el.id; $("#main").innerHTML = viewStep(5); focusSel("#" + id);
+  }
+});
+
+$("#repoLink").href = REPO_URL;
+render();
+</script>
+</body>
+</html>
